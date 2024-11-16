@@ -14,11 +14,11 @@ form.addEventListener("submit",async(event)=>{
 
     const response=await axios.post(`http://localhost:3000/users/signup`,signupDetails)
     if(response.status===201){
-        window.location.href= "../signup/signup.html"
+        window.location.href= "../login/login.html"
     }else{
         throw new Error("failed to login")
     }
     }catch(err){
-        document.body.innerHTML +=`<div style="color:red;">${err}<div>`
+        document.body.innerHTML +=`<div style="color:red;">${err}</div>`
     }    
 })

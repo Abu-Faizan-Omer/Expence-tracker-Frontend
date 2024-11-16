@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expence tracker Frontend</title>
+</head>
+<body>
+    <form id="form">
+        <label for="expenceid">Expence:</label>
+        <input type="number" name="expence" id="expenceid" required>
+
+        <label for="descriptionid">Description:</label>
+        <input type="text" name="description" id="descriptionid" required>
+
+        <label for="dropdown">Categories:</label>
+        <select name="cat">
+            <option value="food">Food</option>
+            <option value="petrol">Petrol</option>
+            <option value="salary">Salary</option>
+        </select>
+        <button >Submit</button>
+    </form>
+
+    <ul id="listofitem"></ul>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>
+    <script src="./response.js"></script>
+</body>
+</html>
