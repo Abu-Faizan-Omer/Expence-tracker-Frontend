@@ -1,58 +1,80 @@
-const form=document.getElementById("form")
-form.addEventListener("submit",async function(event){
-    try{    
-        event.preventDefault()
+// Ensure token is globally available
+const token = localStorage.getItem('token');
+console.log("Token from localStorage:", token); // Debug line to ensure token is present
 
-        const expence=event.target.expence.value
-        const description=event.target.description.value
-        const categories=event.target.cat.value
+// Check if token is found before proceeding
+if (!token) {
+    console.error("No token found in localStorage. Authorization will fail.");
+}
 
-        const expences={
-            expence:expence,
-            description:description,
-            categories:categories
-        }
-        const response=await axios.post("http://localhost:3000/expence/post",expences)
+// Form submission handler
+form.addEventListener("submit", async function(event) {
+    try {
+        event.preventDefault();
+
+        const expence = event.target.expence.value;
+        const description = event.target.description.value;
+        const categories = event.target.cat.value;
+
+        const expences = {
+            expence: expence,
+            description: description,
+            categories: categories
+        };
+
+        const token=localStorage.getItem('token')
+        const response = await axios.post("http://localhost:3000/expence/post", expences, {
+            headers: { 'Authorization': token }
+        });
+
         if (response.status === 201) {
             alert(response.data.message);
-            showUserOnScreen(expences)
+            showUserOnScreen(expences);
         }
-    }catch(err)
-    {
-        console.log(err)
-    }    
+    } catch (err) {
+        console.error("Error during form submission:", err);
+    }
 })
-function showUserOnScreen(expences){
-    const ul=document.getElementById("listofitem")
-    const li=document.createElement("li")
-    li.textContent=`${expences.expence}---${expences.description}---${expences.categories}`
+function showUserOnScreen(expenses) {
+    const ul = document.getElementById("listofitem");
+    const li = document.createElement("li");
+    li.textContent = `${expenses.expence}---${expenses.description}---${expenses.categories}`;
 
-    const deletebtn=document.createElement("button")
-    const deletebtntext=document.createTextNode("Delete")
-    deletebtn.appendChild(deletebtntext)
+    const deletebtn = document.createElement("button");
+    deletebtn.textContent = "Delete";
 
-    deletebtn.addEventListener("click",async function(){
-        try{
-            await axios.delete(`http://localhost:3000/expence/delete/${expences.id}`)
-            li.remove()
-        }catch{
-            console.log(`error in Deleting`)
+    deletebtn.addEventListener("click", async function() {
+        try {
+            const token = localStorage.getItem('token');
+            await axios.delete(`http://localhost:3000/expence/delete/${expenses.id}`,{headers: { 'Authorization': token }});
+            li.remove();
+        } catch (err) {
+            console.error("Error in deleting:", err);
         }
-    })
+    });
 
-    li.appendChild(deletebtn)
-
-    ul.appendChild(li)
+    li.appendChild(deletebtn);
+    ul.appendChild(li);
 }
+
+
+// Display expenses on page load
 window.addEventListener("DOMContentLoaded", async function () {
     try {
-        const response = await axios.get("http://localhost:3000/expence/get")
-        const expenses = response.data;
+        if (token) {
+            const token=localStorage.getItem('token')
+            const response = await axios.get("http://localhost:3000/expence/get", {
+                headers: { 'Authorization':token }
+            });
+            const expenses = response.data;
 
-        expenses.forEach(expense => {
-            showUserOnScreen(expense);
-        });
+            expenses.forEach(expense => {
+                showUserOnScreen(expense);
+            });
+        } else {
+            console.log("Token not found in localStorage");
+        }
     } catch (err) {
-        console.log("Error loading expenses:", err);
+        console.error("Error loading expenses:", err);
     }
 });
