@@ -57,12 +57,33 @@ function showUserOnScreen(expenses) {
     ul.appendChild(li);
 }
 
+function showPremiumUserMessage(){
+        document.getElementById("rzp-button1").style.visibility="hidden"
+         document.getElementById("message").innerHTML=`You are a Premium User`
+}
+
+function parseJwt (token) {
+    var base64Url = token.split('.')[1];
+    var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
 
 // Display expenses on page load
 window.addEventListener("DOMContentLoaded", async function () {
     try {
         if (token) {
             const token=localStorage.getItem('token')
+            const decodeToken=parseJwt(token)
+            console.log(decodeToken)
+            const ispremiumuser=decodeToken.ispremiumuser
+            if(ispremiumuser){
+                showPremiumUserMessage()
+            }
+
             const response = await axios.get("http://localhost:3000/expence/get", {
                 headers: { 'Authorization':token }
             });
@@ -90,13 +111,17 @@ document.getElementById("rzp-button1").onclick=async function(e)
     let options=
     {
         "key":response.data.key_id,
-        "order_id":response.data.order_id,
+        "order_id":response.data.order.id,
         "handler":async function(response){
             await axios.post("http://localhost:3000/purchase/updateTransactionStatus",{
                 order_id:options.order_id,
                 payment_id:response.razorpay_payment_id,
             },{headers: { 'Authorization':token } })
             alert('You are a Premium User Now')
+            //remove button
+            document.getElementById("rzp-button1").style.visibility="hidden"
+            document.getElementById("message").innerHTML=`You are a Premium User`
+            localStorage.setItem('token',res.data.token)
         }
     }
     const rzpl=new Razorpay(options)
