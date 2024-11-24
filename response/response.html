@@ -13,14 +13,16 @@
         <label for="descriptionid">Description:</label>
         <input type="text" name="description" id="descriptionid" required>
 
-        <label for="dropdown">Categories:</label>
-        <select name="cat">
+        <label for="categoryid">Categories:</label>
+        <select name="cat" id="categoryid">
             <option value="food">Food</option>
             <option value="petrol">Petrol</option>
             <option value="salary">Salary</option>
         </select>
         <button >Submit</button>
     </form>
+    <button id="rzp-button1">Buy Premium</button>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
     <ul id="listofitem"></ul>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"></script>

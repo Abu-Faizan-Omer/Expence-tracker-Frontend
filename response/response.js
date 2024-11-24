@@ -78,3 +78,33 @@ window.addEventListener("DOMContentLoaded", async function () {
         console.error("Error loading expenses:", err);
     }
 });
+
+//
+document.getElementById("rzp-button1").onclick=async function(e)
+{
+    const token=localStorage.getItem('token')
+    const response=await axios.get("http://localhost:3000/purchase/premiummembership",{
+        headers: { 'Authorization':token }
+    })
+    console.log(response)
+    let options=
+    {
+        "key":response.data.key_id,
+        "order_id":response.data.order_id,
+        "handler":async function(response){
+            await axios.post("http://localhost:3000/purchase/updateTransactionStatus",{
+                order_id:options.order_id,
+                payment_id:response.razorpay_payment_id,
+            },{headers: { 'Authorization':token } })
+            alert('You are a Premium User Now')
+        }
+    }
+    const rzpl=new Razorpay(options)
+    rzpl.open();
+    e.preventDefault()
+     
+    rzpl.on('Payment.failed',function(response){
+        console.log(response)
+        alert('Something went wrong')
+    })
+}
