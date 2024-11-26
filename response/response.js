@@ -30,6 +30,7 @@ form.addEventListener("submit", async function(event) {
         if (response.status === 201) {
             alert(response.data.message);
             showUserOnScreen(expences);
+            //showUserOnScreen(response.data.expenceamount)
         }
     } catch (err) {
         console.error("Error during form submission:", err);
@@ -61,7 +62,7 @@ function showPremiumUserMessage(){
         document.getElementById("rzp-button1").style.visibility="hidden"
          document.getElementById("message").innerHTML=`You are a Premium User`
 }
-
+//this is downloaded how to decode jwt token frontend
 function parseJwt (token) {
     var base64Url = token.split('.')[1];
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -76,18 +77,20 @@ function parseJwt (token) {
 window.addEventListener("DOMContentLoaded", async function () {
     try {
         if (token) {
-            const token=localStorage.getItem('token')
+            //const token=localStorage.getItem('token')
             const decodeToken=parseJwt(token)
             console.log(decodeToken)
             const ispremiumuser=decodeToken.ispremiumuser
             if(ispremiumuser){
                 showPremiumUserMessage()
+                showLeaderBoard()
             }
 
             const response = await axios.get("http://localhost:3000/expence/get", {
                 headers: { 'Authorization':token }
             });
             const expenses = response.data;
+            const totalExpense = response.data.totalExpense;
 
             expenses.forEach(expense => {
                 showUserOnScreen(expense);
@@ -117,11 +120,15 @@ document.getElementById("rzp-button1").onclick=async function(e)
                 order_id:options.order_id,
                 payment_id:response.razorpay_payment_id,
             },{headers: { 'Authorization':token } })
+
             alert('You are a Premium User Now')
+
             //remove button
             document.getElementById("rzp-button1").style.visibility="hidden"
             document.getElementById("message").innerHTML=`You are a Premium User`
-            localStorage.setItem('token',res.data.token)
+
+            localStorage.setItem('token',response.data.token)
+            showLeaderBoard()
         }
     }
     const rzpl=new Razorpay(options)
@@ -132,4 +139,22 @@ document.getElementById("rzp-button1").onclick=async function(e)
         console.log(response)
         alert('Something went wrong')
     })
+}
+
+function showLeaderBoard(){
+    const inputElement=document.createElement("input")
+    inputElement.type="button"
+    inputElement.value="Show Leaderboard"
+    inputElement.onclick=async() =>{
+        const token=localStorage.getItem("token")
+        const userLeaderBoardArray=await axios.get("http://localhost:3000/premium/showLeaderBoard",{headers: { 'Authorization':token } })
+        console.log(userLeaderBoardArray)
+
+        let leaderboardElem=document.getElementById("leaderboard")
+        leaderboardElem.innerHTML +="<h1> Show Leaderboard </h1>"
+        userLeaderBoardArray.data.forEach((userdetails) =>{
+            leaderboardElem.innerHTML +=`<li> Name - ${userdetails.name} Total Expence - ${userdetails.totalExpenses  ||0 }</li>`
+        })
+    }
+    document.getElementById('message').appendChild(inputElement)
 }
