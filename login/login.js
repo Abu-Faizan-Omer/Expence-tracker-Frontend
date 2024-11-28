@@ -17,3 +17,7 @@ async function login(event) {
         document.body.innerHTML += `<div style="color:red;">${err.response ? err.response.data.message : 'Login failed'}</div>`;
     }
 }
+
+function forgotpassword() {
+    window.location.href = "../ForgotPassword/forgot.html"
+}
