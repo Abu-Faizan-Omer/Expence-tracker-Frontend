@@ -93,7 +93,12 @@ window.addEventListener("DOMContentLoaded", async function () {
             const totalExpense = response.data.totalExpense;
 
             expenses.forEach(expense => {
+
+                // addNewExpense(expense);
+                // addNewExpensetoUI(expense);
+
                 showUserOnScreen(expense);
+
             });
         } else {
             console.log("Token not found in localStorage");
@@ -157,4 +162,23 @@ function showLeaderBoard(){
         })
     }
     document.getElementById('message').appendChild(inputElement)
+}
+
+function download(){
+    axios.get('http://localhost:3000/users/download', { headers: {"Authorization" : token} })
+    .then((response) => {
+        if(response.status === 200){
+            //the bcakend is essentially sending a download link
+            //  which if we open in browser, the file would download
+            var a = document.createElement("a");
+            a.href = response.data.fileURL;
+            a.download = 'myexpense.csv';
+            a.click();
+        } else {
+            throw new Error(response.data.message)
+        }
+    })
+    .catch((err) => {
+        console.log(err)
+    });
 }
